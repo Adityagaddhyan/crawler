@@ -1,6 +1,6 @@
 import httpx
 from bs4 import BeautifulSoup
-from urllib.parse import quote, unquote, urlparse, parse_qs
+from urllib.parse import urlencode, unquote, urlparse, parse_qs
 
 try:
     from .models import SearchResult
@@ -19,9 +19,57 @@ def clean_duckduckgo_url(url: str) -> str:
     return url
 
 
-async def search_duckduckgo(keyword: str, category: str, limit: int = 20) -> list[SearchResult]:
+def build_search_query(
+    keyword: str,
+    category: str,
+    time_range: str = "any",
+    custom_from: str | None = None,
+    custom_to: str | None = None,
+) -> str:
     query = f"{keyword} {category}"
-    url = f"https://duckduckgo.com/html/?q={quote(query)}"
+
+    if time_range == "custom":
+        if custom_from:
+            query = f"{query} after:{custom_from}"
+        if custom_to:
+            query = f"{query} before:{custom_to}"
+
+    return query
+
+
+def duckduckgo_date_filter(time_range: str) -> str | None:
+    return {
+        "last_24h": "d",
+        "last_week": "w",
+        "last_month": "m",
+    }.get(time_range)
+
+
+async def search_duckduckgo(
+    keyword: str,
+    category: str,
+    limit: int = 20,
+    page: int = 1,
+    time_range: str = "any",
+    custom_from: str | None = None,
+    custom_to: str | None = None,
+) -> list[SearchResult]:
+    query = build_search_query(
+        keyword=keyword,
+        category=category,
+        time_range=time_range,
+        custom_from=custom_from,
+        custom_to=custom_to,
+    )
+    params = {
+        "q": query,
+        "s": max(page - 1, 0) * limit,
+    }
+    date_filter = duckduckgo_date_filter(time_range)
+    if date_filter:
+        params["df"] = date_filter
+
+    url = f"https://duckduckgo.com/html/?{urlencode(params)}"
 
     headers = {
         "User-Agent": "Mozilla/5.0"

@@ -40,12 +40,24 @@ async def crawl_discover_stream(
     keyword: str = Query(..., min_length=1),
     category: str = Query("company", min_length=1),
     max_pages: int = Query(20, ge=1, le=50),
+    page: int = Query(1, ge=1),
+    time_range: str = Query("any"),
+    custom_from: str | None = Query(None),
+    custom_to: str | None = Query(None),
 ):
-    request = CrawlRequest(keyword=keyword, category=category, max_pages=max_pages)
+    request = CrawlRequest(
+        keyword=keyword,
+        category=category,
+        max_pages=max_pages,
+        page=page,
+        time_range=time_range,
+        custom_from=custom_from,
+        custom_to=custom_to,
+    )
 
     async def events():
         count = 0
-        yield sse_event("status", {"message": "Searching DuckDuckGo"})
+        yield sse_event("status", {"message": f"Searching DuckDuckGo page {request.page}"})
 
         try:
             async for site in discover_sites_stream(request):

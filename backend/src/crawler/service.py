@@ -9,7 +9,11 @@ async def discover_sites_stream(request: CrawlRequest):
     search_results = await search_duckduckgo(
         keyword=request.keyword,
         category=request.category,
-        limit=request.max_pages
+        limit=request.max_pages,
+        page=request.page,
+        time_range=request.time_range,
+        custom_from=request.custom_from,
+        custom_to=request.custom_to,
     )
 
     discovered = {}

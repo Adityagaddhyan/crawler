@@ -44,7 +44,7 @@
 
     form {
       display: grid;
-      grid-template-columns: minmax(180px, 1fr) 170px 120px auto;
+      grid-template-columns: minmax(180px, 1fr) 150px 140px 120px auto;
       gap: 12px;
       align-items: end;
       padding: 16px;
@@ -61,7 +61,8 @@
       font-weight: 600;
     }
 
-    input {
+    input,
+    select {
       width: 100%;
       height: 40px;
       border: 1px solid var(--line);
@@ -72,7 +73,8 @@
       background: #fff;
     }
 
-    input:focus {
+    input:focus,
+    select:focus {
       border-color: var(--accent);
       outline: 3px solid rgba(15, 118, 110, 0.16);
     }
@@ -96,6 +98,47 @@
     button:disabled {
       cursor: not-allowed;
       opacity: 0.65;
+    }
+
+    .custom-dates {
+      display: none;
+      grid-template-columns: repeat(2, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+      padding: 0 16px 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-top: 0;
+      border-radius: 0 0 8px 8px;
+    }
+
+    .custom-dates.visible {
+      display: grid;
+    }
+
+    .pager {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .pager-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .secondary {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+    }
+
+    .secondary:hover {
+      border-color: var(--accent);
+      background: #f2fbf9;
     }
 
     .status {
@@ -172,6 +215,14 @@
         grid-template-columns: 1fr;
       }
 
+      .custom-dates {
+        grid-template-columns: 1fr;
+      }
+
+      .pager {
+        display: grid;
+      }
+
       .result-header {
         display: grid;
       }
@@ -196,22 +247,57 @@
         <input id="category" name="category" value="company" required>
       </label>
       <label>
-        Max pages
+        Time
+        <select id="time-range" name="time_range">
+          <option value="any">Any time</option>
+          <option value="last_24h">Last 24 hours</option>
+          <option value="last_week">Last week</option>
+          <option value="last_month">Last month</option>
+          <option value="custom">Custom</option>
+        </select>
+      </label>
+      <label>
+        Results/page
         <input id="max-pages" name="max_pages" type="number" min="1" max="50" value="20" required>
       </label>
+      <input id="page" name="page" type="hidden" value="1">
       <button id="submit" type="submit">Search</button>
     </form>
 
-    <div id="status" class="status">Ready</div>
+    <div id="custom-dates" class="custom-dates">
+      <label>
+        From
+        <input id="custom-from" name="custom_from" form="search-form" type="date">
+      </label>
+      <label>
+        To
+        <input id="custom-to" name="custom_to" form="search-form" type="date">
+      </label>
+    </div>
+
+    <div class="pager">
+      <div id="status" class="status">Ready</div>
+      <div class="pager-actions">
+        <button id="prev-page" class="secondary" type="button" disabled>Previous</button>
+        <button id="next-page" class="secondary" type="button" disabled>Next page</button>
+      </div>
+    </div>
     <section id="results" class="results" aria-live="polite"></section>
   </main>
 
   <script>
     const form = document.querySelector("#search-form");
     const submit = document.querySelector("#submit");
+    const nextPage = document.querySelector("#next-page");
+    const prevPage = document.querySelector("#prev-page");
+    const pageInput = document.querySelector("#page");
+    const timeRange = document.querySelector("#time-range");
+    const customDates = document.querySelector("#custom-dates");
     const statusEl = document.querySelector("#status");
     const resultsEl = document.querySelector("#results");
     let stream = null;
+    let currentPage = 1;
+    let isSearching = false;
 
     function setStatus(message, isError = false) {
       statusEl.textContent = message;
@@ -244,16 +330,34 @@
       resultsEl.append(article);
     }
 
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
+    function setSearching(searching) {
+      isSearching = searching;
+      submit.disabled = searching;
+      nextPage.disabled = searching;
+      prevPage.disabled = searching || currentPage <= 1;
+    }
 
+    function updateCustomDates() {
+      const isCustom = timeRange.value === "custom";
+      customDates.classList.toggle("visible", isCustom);
+      document.querySelector("#custom-from").disabled = !isCustom;
+      document.querySelector("#custom-to").disabled = !isCustom;
+    }
+
+    function startSearch({ page = 1, append = false } = {}) {
       if (stream) {
         stream.close();
       }
 
-      resultsEl.replaceChildren();
-      submit.disabled = true;
-      setStatus("Starting search");
+      currentPage = page;
+      pageInput.value = String(currentPage);
+
+      if (!append) {
+        resultsEl.replaceChildren();
+      }
+
+      setSearching(true);
+      setStatus(`Starting page ${currentPage}`);
 
       const params = new URLSearchParams(new FormData(form));
       stream = new EventSource(`/crawl/discover/stream?${params.toString()}`);
@@ -266,13 +370,15 @@
       stream.addEventListener("result", (event) => {
         const site = JSON.parse(event.data);
         addResult(site);
-        setStatus(`Found ${resultsEl.children.length} result${resultsEl.children.length === 1 ? "" : "s"}`);
+        setStatus(`Page ${currentPage}: found ${resultsEl.children.length} total result${resultsEl.children.length === 1 ? "" : "s"}`);
       });
 
       stream.addEventListener("done", (event) => {
         const payload = JSON.parse(event.data);
-        setStatus(`Done. Found ${payload.count} result${payload.count === 1 ? "" : "s"}.`);
-        submit.disabled = false;
+        setStatus(`Page ${currentPage} done. Found ${payload.count} result${payload.count === 1 ? "" : "s"} on this page.`);
+        setSearching(false);
+        nextPage.disabled = payload.count === 0;
+        prevPage.disabled = currentPage <= 1;
         stream.close();
         stream = null;
       });
@@ -280,18 +386,34 @@
       stream.addEventListener("failure", (event) => {
         const payload = JSON.parse(event.data);
         setStatus(payload.message, true);
-        submit.disabled = false;
+        setSearching(false);
         stream.close();
         stream = null;
       });
 
       stream.addEventListener("error", () => {
         setStatus("Search stream disconnected", true);
-        submit.disabled = false;
+        setSearching(false);
         stream.close();
         stream = null;
       });
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      startSearch({ page: 1, append: false });
     });
+
+    nextPage.addEventListener("click", () => {
+      startSearch({ page: currentPage + 1, append: true });
+    });
+
+    prevPage.addEventListener("click", () => {
+      startSearch({ page: Math.max(currentPage - 1, 1), append: false });
+    });
+
+    timeRange.addEventListener("change", updateCustomDates);
+    updateCustomDates();
   </script>
 </body>
 </html>

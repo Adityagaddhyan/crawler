@@ -6,6 +6,10 @@ class CrawlRequest(BaseModel):
     keyword: str
     category: str
     max_pages: int = 20
+    page: int = 1
+    time_range: str = "any"
+    custom_from: Optional[str] = None
+    custom_to: Optional[str] = None
 
 
 class SearchResult(BaseModel):
