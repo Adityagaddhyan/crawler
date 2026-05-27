@@ -7,14 +7,20 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f7f8fa;
+      --bg: #f4f6f8;
       --panel: #ffffff;
-      --text: #1f2933;
-      --muted: #637083;
-      --line: #d9dee7;
-      --accent: #0f766e;
-      --accent-dark: #0b5f59;
+      --panel-subtle: #fafbfc;
+      --text: #17202a;
+      --muted: #687386;
+      --line: #d7dde5;
+      --line-strong: #c4ccd8;
+      --accent: #087f8c;
+      --accent-dark: #075f69;
+      --accent-soft: #e5f6f8;
+      --ink: #263241;
+      --gold: #b7791f;
       --danger: #b42318;
+      --shadow: 0 18px 50px rgba(23, 32, 42, 0.08);
     }
 
     * {
@@ -29,28 +35,96 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0 0 auto;
+      height: 220px;
+      background: linear-gradient(180deg, #e9edf2 0%, rgba(233, 237, 242, 0) 100%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
     main {
-      width: min(1100px, calc(100% - 32px));
+      width: min(1240px, calc(100% - 36px));
       margin: 0 auto;
-      padding: 32px 0;
+      padding: 24px 0 40px;
     }
 
     h1 {
-      margin: 0 0 20px;
-      font-size: 28px;
-      font-weight: 700;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 750;
       letter-spacing: 0;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 10px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid rgba(8, 127, 140, 0.28);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--accent-dark);
+      font-weight: 800;
+      box-shadow: 0 6px 18px rgba(23, 32, 42, 0.07);
+    }
+
+    .brand-text {
+      display: grid;
+      gap: 2px;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .summary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(23, 32, 42, 0.05);
     }
 
     form {
       display: grid;
-      grid-template-columns: minmax(180px, 1fr) 150px 140px 120px auto;
+      grid-template-columns: minmax(180px, 1fr) 150px 140px 150px 120px auto;
       gap: 12px;
       align-items: end;
-      padding: 16px;
+      padding: 18px;
       background: var(--panel);
-      border: 1px solid var(--line);
+      border: 1px solid rgba(196, 204, 216, 0.8);
       border-radius: 8px;
+      box-shadow: var(--shadow);
     }
 
     label {
@@ -58,19 +132,19 @@
       gap: 6px;
       color: var(--muted);
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     input,
     select {
       width: 100%;
-      height: 40px;
+      height: 42px;
       border: 1px solid var(--line);
       border-radius: 6px;
-      padding: 0 10px;
+      padding: 0 11px;
       color: var(--text);
       font: inherit;
-      background: #fff;
+      background: var(--panel-subtle);
     }
 
     input:focus,
@@ -89,6 +163,8 @@
       font: inherit;
       font-weight: 700;
       cursor: pointer;
+      white-space: nowrap;
+      transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
     }
 
     button:hover {
@@ -100,16 +176,23 @@
       opacity: 0.65;
     }
 
+    .primary-action {
+      height: 42px;
+      min-width: 104px;
+      box-shadow: 0 10px 20px rgba(8, 127, 140, 0.18);
+    }
+
     .custom-dates {
       display: none;
       grid-template-columns: repeat(2, minmax(140px, 1fr));
       gap: 12px;
-      margin-top: 12px;
-      padding: 0 16px 16px;
+      margin-top: -1px;
+      padding: 0 18px 18px;
       background: var(--panel);
-      border: 1px solid var(--line);
+      border: 1px solid rgba(196, 204, 216, 0.8);
       border-top: 0;
       border-radius: 0 0 8px 8px;
+      box-shadow: 0 18px 50px rgba(23, 32, 42, 0.05);
     }
 
     .custom-dates.visible {
@@ -121,7 +204,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      margin: 14px 0;
+      margin: 16px 0 12px;
     }
 
     .pager-actions {
@@ -138,18 +221,166 @@
 
     .secondary:hover {
       border-color: var(--accent);
-      background: #f2fbf9;
+      background: var(--accent-soft);
+    }
+
+    .ghost {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .ghost:hover {
+      background: #f0f3f7;
+      color: var(--text);
+    }
+
+    .bookmark-toggle.bookmarked {
+      border-color: rgba(15, 118, 110, 0.35);
+      background: var(--accent-soft);
+      color: var(--accent-dark);
     }
 
     .status {
-      min-height: 24px;
-      margin: 14px 0;
-      color: var(--muted);
+      display: inline-flex;
+      min-height: 36px;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--ink);
       font-size: 14px;
+      font-weight: 650;
+    }
+
+    .status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
     }
 
     .status.error {
       color: var(--danger);
+      border-color: rgba(180, 35, 24, 0.25);
+    }
+
+    .status.error::before {
+      background: var(--danger);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .metric {
+      display: grid;
+      gap: 4px;
+      min-height: 82px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 8px 22px rgba(23, 32, 42, 0.05);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 780;
+    }
+
+    .storage-panel {
+      display: grid;
+      gap: 12px;
+      margin: 16px 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 8px 22px rgba(23, 32, 42, 0.05);
+    }
+
+    .storage-header,
+    .storage-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .storage-title {
+      display: grid;
+      gap: 3px;
+    }
+
+    .storage-title strong {
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .storage-title span,
+    .storage-meta {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .storage-path {
+      flex: 1;
+      min-width: 220px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+    }
+
+    .storage-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    dialog {
+      width: min(620px, calc(100% - 28px));
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0;
+      color: var(--text);
+      background: var(--panel);
+      box-shadow: 0 28px 80px rgba(23, 32, 42, 0.22);
+    }
+
+    dialog::backdrop {
+      background: rgba(23, 32, 42, 0.34);
+    }
+
+    .dialog-body {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--line);
+      background: var(--panel-subtle);
     }
 
     .results {
@@ -157,13 +388,73 @@
       gap: 10px;
     }
 
+    .tabs {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0 12px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .tab-list {
+      display: flex;
+      gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-subtle);
+    }
+
+    .tab {
+      height: 34px;
+      border: 0;
+      border-radius: 5px;
+      padding: 0 12px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .tab:hover {
+      background: #fff;
+      color: var(--text);
+    }
+
+    .tab.active {
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(23, 32, 42, 0.08);
+      color: var(--accent-dark);
+    }
+
+    .export-actions {
+      display: flex;
+      gap: 8px;
+      padding-bottom: 8px;
+    }
+
+    .panel[hidden] {
+      display: none;
+    }
+
     .result {
       display: grid;
-      gap: 8px;
-      padding: 14px 16px;
+      gap: 10px;
+      padding: 16px 18px;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
+      box-shadow: 0 8px 22px rgba(23, 32, 42, 0.04);
+      transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+    }
+
+    .result:hover {
+      border-color: var(--line-strong);
+      box-shadow: 0 16px 36px rgba(23, 32, 42, 0.08);
+      transform: translateY(-1px);
     }
 
     .result-header {
@@ -173,9 +464,18 @@
       align-items: start;
     }
 
+    .result-actions {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 8px;
+      align-items: start;
+    }
+
     .result a {
       color: var(--text);
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 760;
+      line-height: 1.35;
       text-decoration: none;
       overflow-wrap: anywhere;
     }
@@ -189,7 +489,7 @@
       flex: 0 0 auto;
       border: 1px solid rgba(15, 118, 110, 0.28);
       border-radius: 999px;
-      padding: 3px 8px;
+      padding: 4px 9px;
       color: var(--accent-dark);
       font-size: 12px;
       font-weight: 700;
@@ -202,17 +502,41 @@
       gap: 8px 14px;
       color: var(--muted);
       font-size: 13px;
+      line-height: 1.45;
       overflow-wrap: anywhere;
+    }
+
+    .empty {
+      padding: 34px 18px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(255, 255, 255, 0.78);
     }
 
     @media (max-width: 760px) {
       main {
-        width: min(100% - 24px, 1100px);
-        padding: 20px 0;
+        width: min(100% - 24px, 1240px);
+        padding: 18px 0 32px;
       }
 
       form {
         grid-template-columns: 1fr;
+      }
+
+      .topbar,
+      .tabs {
+        display: grid;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .storage-header,
+      .storage-row {
+        display: grid;
       }
 
       .custom-dates {
@@ -227,6 +551,11 @@
         display: grid;
       }
 
+      .result-actions,
+      .export-actions {
+        flex-wrap: wrap;
+      }
+
       .score {
         width: max-content;
       }
@@ -235,7 +564,16 @@
 </head>
 <body>
   <main>
-    <h1>Crawler</h1>
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">C</div>
+        <div class="brand-text">
+          <div class="eyebrow">Discovery Console</div>
+          <h1>Crawler</h1>
+        </div>
+      </div>
+      <div id="bookmark-summary" class="summary">0 bookmarks</div>
+    </div>
 
     <form id="search-form">
       <label>
@@ -257,11 +595,19 @@
         </select>
       </label>
       <label>
+        Strategy
+        <select id="strategy" name="strategy">
+          <option value="balanced">Balanced</option>
+          <option value="fast">Fast</option>
+          <option value="deep">Deep</option>
+        </select>
+      </label>
+      <label>
         Results/page
         <input id="max-pages" name="max_pages" type="number" min="1" max="50" value="20" required>
       </label>
       <input id="page" name="page" type="hidden" value="1">
-      <button id="submit" type="submit">Search</button>
+      <button id="submit" class="primary-action" type="submit">Search</button>
     </form>
 
     <div id="custom-dates" class="custom-dates">
@@ -282,8 +628,79 @@
         <button id="next-page" class="secondary" type="button" disabled>Next page</button>
       </div>
     </div>
-    <section id="results" class="results" aria-live="polite"></section>
+
+    <section class="metrics" aria-label="Session metrics">
+      <div class="metric">
+        <span>Results</span>
+        <strong id="result-count">0</strong>
+      </div>
+      <div class="metric">
+        <span>Page</span>
+        <strong id="page-count">1</strong>
+      </div>
+      <div class="metric">
+        <span>Strategy</span>
+        <strong id="strategy-label">Balanced</strong>
+      </div>
+    </section>
+
+    <section class="storage-panel" aria-label="Bookmark storage">
+      <div class="storage-header">
+        <div class="storage-title">
+          <strong>Bookmark storage</strong>
+          <span id="storage-meta">Checking storage</span>
+        </div>
+        <div class="storage-actions">
+          <button id="create-storage" class="secondary" type="button">Create file</button>
+          <button id="reveal-storage" class="secondary" type="button">Reveal file</button>
+          <button id="download-json" class="secondary" type="button">Download JSON</button>
+          <button id="import-json" class="secondary" type="button">Import JSON</button>
+          <button id="replace-json" class="secondary" type="button">Replace JSON</button>
+        </div>
+      </div>
+      <div class="storage-row">
+        <input id="storage-path" class="storage-path" aria-label="Bookmark file path">
+        <button id="save-storage-path" class="secondary" type="button">Save location</button>
+      </div>
+      <input id="import-file" type="file" accept="application/json,.json" hidden>
+    </section>
+
+    <div class="tabs">
+      <div class="tab-list" role="tablist" aria-label="Crawler views">
+        <button id="results-tab" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="results-panel">Results</button>
+        <button id="bookmarks-tab" class="tab" type="button" role="tab" aria-selected="false" aria-controls="bookmarks-panel">Bookmarks</button>
+      </div>
+      <div class="export-actions">
+        <button id="export-md" class="secondary" type="button" disabled>Export MD</button>
+        <button id="export-csv" class="secondary" type="button" disabled>Export CSV</button>
+      </div>
+    </div>
+
+    <section id="results-panel" class="panel" role="tabpanel" aria-labelledby="results-tab">
+      <div id="results" class="results" aria-live="polite"></div>
+    </section>
+    <section id="bookmarks-panel" class="panel" role="tabpanel" aria-labelledby="bookmarks-tab" hidden>
+      <div id="bookmarks" class="results" aria-live="polite"></div>
+    </section>
   </main>
+
+  <dialog id="storage-dialog">
+    <div class="dialog-body">
+      <div class="storage-title">
+        <strong>Bookmark file location</strong>
+        <span id="dialog-storage-meta">Review storage before continuing</span>
+      </div>
+      <label>
+        Active JSON file
+        <input id="dialog-storage-path" class="storage-path">
+      </label>
+    </div>
+    <div class="dialog-actions">
+      <button id="dialog-import" class="secondary" type="button">Import JSON</button>
+      <button id="dialog-save" class="secondary" type="button">Save location</button>
+      <button id="dialog-continue" type="button">Continue</button>
+    </div>
+  </dialog>
 
   <script>
     const form = document.querySelector("#search-form");
@@ -295,16 +712,154 @@
     const customDates = document.querySelector("#custom-dates");
     const statusEl = document.querySelector("#status");
     const resultsEl = document.querySelector("#results");
+    const bookmarksEl = document.querySelector("#bookmarks");
+    const bookmarkSummary = document.querySelector("#bookmark-summary");
+    const resultsTab = document.querySelector("#results-tab");
+    const bookmarksTab = document.querySelector("#bookmarks-tab");
+    const resultsPanel = document.querySelector("#results-panel");
+    const bookmarksPanel = document.querySelector("#bookmarks-panel");
+    const exportMd = document.querySelector("#export-md");
+    const exportCsv = document.querySelector("#export-csv");
+    const resultCount = document.querySelector("#result-count");
+    const pageCount = document.querySelector("#page-count");
+    const strategyLabel = document.querySelector("#strategy-label");
+    const storageMeta = document.querySelector("#storage-meta");
+    const storagePath = document.querySelector("#storage-path");
+    const saveStoragePath = document.querySelector("#save-storage-path");
+    const createStorage = document.querySelector("#create-storage");
+    const revealStorage = document.querySelector("#reveal-storage");
+    const downloadJson = document.querySelector("#download-json");
+    const importJson = document.querySelector("#import-json");
+    const replaceJson = document.querySelector("#replace-json");
+    const importFile = document.querySelector("#import-file");
+    const storageDialog = document.querySelector("#storage-dialog");
+    const dialogStorageMeta = document.querySelector("#dialog-storage-meta");
+    const dialogStoragePath = document.querySelector("#dialog-storage-path");
+    const dialogImport = document.querySelector("#dialog-import");
+    const dialogSave = document.querySelector("#dialog-save");
+    const dialogContinue = document.querySelector("#dialog-continue");
     let stream = null;
     let currentPage = 1;
     let isSearching = false;
+    const bookmarks = new Map();
 
     function setStatus(message, isError = false) {
       statusEl.textContent = message;
       statusEl.classList.toggle("error", isError);
     }
 
-    function addResult(site) {
+    function updateMetrics() {
+      resultCount.textContent = String(resultsEl.children.length);
+      pageCount.textContent = String(currentPage);
+      const selectedStrategy = document.querySelector("#strategy");
+      strategyLabel.textContent = selectedStrategy.options[selectedStrategy.selectedIndex].textContent;
+    }
+
+    function bookmarkKey(site) {
+      return site.url || site.domain;
+    }
+
+    function bookmarkLabel(site) {
+      return bookmarks.has(bookmarkKey(site)) ? "Bookmarked" : "Bookmark";
+    }
+
+    function renderStorage(storage) {
+      storagePath.value = storage.path || "";
+      dialogStoragePath.value = storage.path || "";
+      const exists = storage.exists ? "ready" : "missing";
+      const modified = storage.last_modified
+        ? new Date(storage.last_modified * 1000).toLocaleString()
+        : "never";
+      const text = `${exists} · ${storage.count} bookmark${storage.count === 1 ? "" : "s"} · ${storage.backup_count} backups · ${modified}`;
+      storageMeta.textContent = text;
+      dialogStorageMeta.textContent = text;
+    }
+
+    async function loadStorage({ prompt = false } = {}) {
+      try {
+        const response = await fetch("/bookmarks/storage");
+        if (!response.ok) {
+          throw new Error("Unable to load storage");
+        }
+
+        const storage = await response.json();
+        renderStorage(storage);
+
+        if (prompt && storageDialog.showModal && !sessionStorage.getItem("storage-reviewed")) {
+          storageDialog.showModal();
+        }
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    }
+
+    async function saveStorageLocation(path) {
+      const response = await fetch("/bookmarks/storage/path", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ path }),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json();
+        throw new Error(payload.detail || "Unable to save storage location");
+      }
+
+      const storage = await response.json();
+      renderStorage(storage);
+      await loadBookmarks();
+    }
+
+    async function createStorageFile() {
+      const response = await fetch("/bookmarks/storage/create", { method: "POST" });
+      if (!response.ok) {
+        throw new Error("Unable to create bookmark file");
+      }
+
+      renderStorage(await response.json());
+      await loadBookmarks();
+    }
+
+    async function revealStorageFile() {
+      const response = await fetch("/bookmarks/storage/reveal", { method: "POST" });
+      if (!response.ok) {
+        throw new Error("Unable to reveal bookmark file");
+      }
+
+      renderStorage(await response.json());
+    }
+
+    async function importBookmarkFile(file, mode) {
+      const text = await file.text();
+      const bookmarksPayload = JSON.parse(text);
+      const response = await fetch("/bookmarks/import", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mode,
+          bookmarks: bookmarksPayload,
+        }),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json();
+        throw new Error(payload.detail || "Unable to import bookmarks");
+      }
+
+      const savedBookmarks = await response.json();
+      bookmarks.clear();
+      for (const site of savedBookmarks) {
+        bookmarks.set(bookmarkKey(site), site);
+      }
+      renderBookmarks();
+      await loadStorage();
+    }
+
+    function renderSite(site, { bookmarkedView = false } = {}) {
       const article = document.createElement("article");
       article.className = "result";
 
@@ -321,13 +876,149 @@
       score.className = "score";
       score.textContent = `${site.relevance_score}%`;
 
+      const bookmarkButton = document.createElement("button");
+      bookmarkButton.type = "button";
+      bookmarkButton.className = `secondary bookmark-toggle${bookmarks.has(bookmarkKey(site)) ? " bookmarked" : ""}`;
+      bookmarkButton.textContent = bookmarkedView ? "Remove" : bookmarkLabel(site);
+      bookmarkButton.addEventListener("click", () => {
+        toggleBookmark(site);
+      });
+
+      const actions = document.createElement("div");
+      actions.className = "result-actions";
+      actions.append(score, bookmarkButton);
+
       const meta = document.createElement("div");
       meta.className = "meta";
       meta.textContent = `${site.domain} · ${site.reason}`;
 
-      header.append(link, score);
+      header.append(link, actions);
       article.append(header, meta);
-      resultsEl.append(article);
+      return article;
+    }
+
+    function addResult(site) {
+      resultsEl.append(renderSite(site));
+      updateMetrics();
+    }
+
+    function renderBookmarks() {
+      bookmarksEl.replaceChildren();
+
+      if (bookmarks.size === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No bookmarks yet.";
+        bookmarksEl.append(empty);
+      } else {
+        for (const site of bookmarks.values()) {
+          bookmarksEl.append(renderSite(site, { bookmarkedView: true }));
+        }
+      }
+
+      const count = bookmarks.size;
+      bookmarkSummary.textContent = `${count} bookmark${count === 1 ? "" : "s"}`;
+      exportMd.disabled = count === 0;
+      exportCsv.disabled = count === 0;
+      refreshResultBookmarkButtons();
+    }
+
+    function refreshResultBookmarkButtons() {
+      const resultCards = resultsEl.querySelectorAll(".result");
+      for (const card of resultCards) {
+        const link = card.querySelector("a");
+        const button = card.querySelector(".bookmark-toggle");
+        if (!link || !button) {
+          continue;
+        }
+
+        const isBookmarked = bookmarks.has(link.href);
+        button.classList.toggle("bookmarked", isBookmarked);
+        button.textContent = isBookmarked ? "Bookmarked" : "Bookmark";
+      }
+    }
+
+    async function loadBookmarks() {
+      try {
+        const response = await fetch("/bookmarks");
+        if (!response.ok) {
+          throw new Error("Unable to load bookmarks");
+        }
+
+        const savedBookmarks = await response.json();
+        bookmarks.clear();
+        for (const site of savedBookmarks) {
+          bookmarks.set(bookmarkKey(site), site);
+        }
+        renderBookmarks();
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    }
+
+    async function toggleBookmark(site) {
+      const key = bookmarkKey(site);
+      const shouldRemove = bookmarks.has(key);
+
+      try {
+        let response;
+        if (shouldRemove) {
+          response = await fetch(`/bookmarks?key=${encodeURIComponent(key)}`, {
+            method: "DELETE",
+          });
+        } else {
+          response = await fetch("/bookmarks", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              ...site,
+              bookmarked_at: new Date().toISOString(),
+            }),
+          });
+        }
+
+        if (!response.ok) {
+          throw new Error("Unable to update bookmarks");
+        }
+
+        const savedBookmarks = await response.json();
+        bookmarks.clear();
+        for (const savedSite of savedBookmarks) {
+          bookmarks.set(bookmarkKey(savedSite), savedSite);
+        }
+      } catch (error) {
+        setStatus(error.message, true);
+        return;
+      }
+
+      renderBookmarks();
+    }
+
+    function showTab(name) {
+      const showBookmarks = name === "bookmarks";
+      bookmarksPanel.hidden = !showBookmarks;
+      resultsPanel.hidden = showBookmarks;
+      bookmarksTab.classList.toggle("active", showBookmarks);
+      resultsTab.classList.toggle("active", !showBookmarks);
+      bookmarksTab.setAttribute("aria-selected", String(showBookmarks));
+      resultsTab.setAttribute("aria-selected", String(!showBookmarks));
+      if (showBookmarks) {
+        renderBookmarks();
+      }
+    }
+
+    function exportMarkdown() {
+      window.location.href = "/bookmarks/export.md";
+    }
+
+    function exportCsvFile() {
+      window.location.href = "/bookmarks/export.csv";
+    }
+
+    function exportJsonFile() {
+      window.location.href = "/bookmarks/export.json";
     }
 
     function setSearching(searching) {
@@ -356,6 +1047,7 @@
         resultsEl.replaceChildren();
       }
 
+      updateMetrics();
       setSearching(true);
       setStatus(`Starting page ${currentPage}`);
 
@@ -377,6 +1069,7 @@
         const payload = JSON.parse(event.data);
         setStatus(`Page ${currentPage} done. Found ${payload.count} result${payload.count === 1 ? "" : "s"} on this page.`);
         setSearching(false);
+        updateMetrics();
         nextPage.disabled = payload.count === 0;
         prevPage.disabled = currentPage <= 1;
         stream.close();
@@ -413,7 +1106,83 @@
     });
 
     timeRange.addEventListener("change", updateCustomDates);
+    document.querySelector("#strategy").addEventListener("change", updateMetrics);
+    resultsTab.addEventListener("click", () => showTab("results"));
+    bookmarksTab.addEventListener("click", () => showTab("bookmarks"));
+    exportMd.addEventListener("click", exportMarkdown);
+    exportCsv.addEventListener("click", exportCsvFile);
+    downloadJson.addEventListener("click", exportJsonFile);
+    createStorage.addEventListener("click", async () => {
+      try {
+        await createStorageFile();
+        setStatus("Bookmark file ready");
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    });
+    revealStorage.addEventListener("click", async () => {
+      try {
+        await revealStorageFile();
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    });
+    saveStoragePath.addEventListener("click", async () => {
+      try {
+        await saveStorageLocation(storagePath.value);
+        setStatus("Bookmark location saved");
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    });
+    importJson.addEventListener("click", () => {
+      importFile.dataset.mode = "merge";
+      importFile.click();
+    });
+    replaceJson.addEventListener("click", () => {
+      if (!confirm("Replace all current bookmarks with the selected JSON file?")) {
+        return;
+      }
+
+      importFile.dataset.mode = "replace";
+      importFile.click();
+    });
+    importFile.addEventListener("change", async () => {
+      const file = importFile.files[0];
+      if (!file) {
+        return;
+      }
+
+      const mode = importFile.dataset.mode || "merge";
+      try {
+        await importBookmarkFile(file, mode);
+        setStatus("Bookmarks imported");
+      } catch (error) {
+        setStatus(error.message, true);
+      } finally {
+        importFile.value = "";
+      }
+    });
+    dialogImport.addEventListener("click", () => {
+      importFile.dataset.mode = "merge";
+      importFile.click();
+    });
+    dialogSave.addEventListener("click", async () => {
+      try {
+        await saveStorageLocation(dialogStoragePath.value);
+        setStatus("Bookmark location saved");
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    });
+    dialogContinue.addEventListener("click", () => {
+      sessionStorage.setItem("storage-reviewed", "true");
+      storageDialog.close();
+    });
     updateCustomDates();
+    updateMetrics();
+    loadStorage({ prompt: true });
+    loadBookmarks();
   </script>
 </body>
 </html>
